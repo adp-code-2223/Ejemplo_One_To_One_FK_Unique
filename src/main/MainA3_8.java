@@ -19,7 +19,7 @@ public class MainA3_8 {
 		SessionFactory sessionFactory = SessionFactoryUtil.getSessionFactory();
 		Session session = sessionFactory.openSession();
 
-		 //crearModuloProfeNuevos(session);
+		 crearModuloProfeNuevos(session);
         //eliminarComunidad(session, 19); // borrado de Melilla como CA
 		
 		crearComunidadYProvincias(session);
@@ -94,7 +94,7 @@ public class MainA3_8 {
 		Transaction tx = session.beginTransaction();
 		try {
 
-			int idCA = 200;
+			int idCA = 900;
 			ComunidadAutonoma ca = new ComunidadAutonoma();
 			ca.setNombre("Nueva CA1");
 			// El id no se asigna automáticamente en esta tabla

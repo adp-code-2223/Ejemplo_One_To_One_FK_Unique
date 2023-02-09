@@ -45,6 +45,7 @@ public class OneToOne {
 		profe.addContactInfo(cInfoNueva);
 
 		try {
+			tx = session.beginTransaction();
 			session.saveOrUpdate(cInfoNueva);
 			session.saveOrUpdate(profe);
 
@@ -68,6 +69,8 @@ public class OneToOne {
 		cInfoNueva.setTlfMovil("666 123 123");
 		Transaction tx = null;
 		try {
+			
+			tx = session.beginTransaction();
 			for (ContactInfo contactInfo : infos) {
 				System.out.println("contact info: " + contactInfo + " profesor: " + contactInfo.getProfesor());
 				Profesor profe = contactInfo.getProfesor();
@@ -75,7 +78,7 @@ public class OneToOne {
 				// Relación bidireccional
 				profe.addContactInfo(cInfoNueva);
 
-				tx = session.beginTransaction();
+				
 				session.saveOrUpdate(cInfoNueva);
 				session.saveOrUpdate(profe);
 
