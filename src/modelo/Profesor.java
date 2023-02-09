@@ -21,8 +21,8 @@ public class Profesor implements java.io.Serializable {
 	private String ape2;
 	private String tipoFuncionario;
 	private Set modulos = new HashSet(0);
-	private Set contactInfos = new HashSet(0);
-	
+	//private Set contactInfos = new HashSet(0);
+	private ContactInfo contactInfo;
 
 	public Profesor() {
 	}
@@ -33,13 +33,13 @@ public class Profesor implements java.io.Serializable {
 		this.ape2 = ape2;
 	}
 
-	public Profesor(String nombre, String ape1, String ape2, String tipoFuncionario, Set modulos, Set contactInfos) {
+	public Profesor(String nombre, String ape1, String ape2, String tipoFuncionario, Set modulos) {
 		this.nombre = nombre;
 		this.ape1 = ape1;
 		this.ape2 = ape2;
 		this.tipoFuncionario = tipoFuncionario;
 		this.modulos = modulos;
-		this.contactInfos = contactInfos;
+		//this.contactInfos = contactInfos;
 	}
 
 	public Integer getId() {
@@ -101,24 +101,30 @@ public class Profesor implements java.io.Serializable {
 
 	}
 
-	public Set getContactInfos() {
-		return this.contactInfos;
-	}
-
-	public void setContactInfos(Set contactInfos) {
-		this.contactInfos = contactInfos;
-	}
+//	public Set getContactInfos() {
+//		return this.contactInfos;
+//	}
+//
+//	public void setContactInfos(Set contactInfos) {
+//		this.contactInfos = contactInfos;
+//	}
 	
 	public void addContactInfo(ContactInfo cInfo){
-		System.out.println("Antes de añadir: Profe con id: " + this.id + " tiene "
-				+ getContactInfos().size() + " infos de contacto");
+		setContactInfo(cInfo);
+		cInfo.setProfesor(this);		
 
-		getContactInfos().add(cInfo);
-
-		System.out.println("Después de añadir: Profe con id: " + this.id + " tiene "
-				+ getContactInfos().size() + " infos de contacto");
-
-		cInfo.setProfesor(this);
 	}
+
+	public ContactInfo getContactInfo() {
+		return contactInfo;
+	}
+
+	public void setContactInfo(ContactInfo contactInfo) {
+		this.contactInfo = contactInfo;
+	}
+	
+	
+	
+	
 
 }

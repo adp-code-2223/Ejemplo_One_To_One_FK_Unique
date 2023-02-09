@@ -18,16 +18,20 @@
         <property name="tipoFuncionario" type="string">
             <column length="100" name="tipoFuncionario"/>
         </property>
-        <set fetch="select" inverse="true" lazy="true" 
-         name="contactInfos" table="contactInfo">
-            <key>
-                <column name="profesorId" 
-                not-null="true" unique="true"/>
-            </key>
-            <one-to-many class="modelo.ContactInfo"/>
-        </set>
-        
-         <set fetch="select" inverse="false" lazy="true" name="modulos" table="profesormodulo">
+<!--         <set fetch="select" inverse="true" lazy="true"  -->
+<!--          name="contactInfos" table="contactInfo"> -->
+<!--             <key> -->
+<!--                 <column name="profesorId"  -->
+<!--                 not-null="true" unique="true"/> -->
+<!--             </key> -->
+<!--              <one-to-many class="modelo.ContactInfo"/>  -->
+            
+<!--         </set> -->
+         <one-to-one name="contactInfo" 
+         class="modelo.ContactInfo" 
+         property-ref="profesor"/>
+         <set fetch="select" inverse="false" lazy="true" 
+         name="modulos" table="profesormodulo">
             <key>
                 <column name="idProfesor" not-null="true"/>
             </key>

@@ -17,25 +17,32 @@ public class OneToOne {
 		SessionFactory sessionFactory = SessionFactoryUtil.getSessionFactory();
 		Session session = sessionFactory.openSession();
 
-		 //addMoreThanOneContactInfoToProfesor(session, 1);
+		 
 
-		addMoreThanOneContactInfoToProfesorFromContactInfo(session, 1);
+		//changeContactInfoFromProfesor(session, 1);
+		//changeContactInfoFromContactInfo(session, 1);
+		//updateContactInfoToProfesor(session, 5);
 
 		session.close();
 		sessionFactory.close();
 
 	}
 
-	private static void addMoreThanOneContactInfoToProfesor(Session session, int profeId) {
+	/*
+	 * Lanza exception: OR: Infracción de la restricción UNIQUE KEY
+	 * 'UC_contactInfo_UNIQUE_profesorID'. No se puede insertar una clave duplicada
+	 * en el objeto 'dbo.contactInfo'. El valor de la clave duplicada es (1).
+	 * No se elimina el contactInfo inicialmente asociado al profesor y se intenta crear otro con el mismo profesorId
+	 */
+	private static void changeContactInfoFromProfesor(Session session, int profeId) {
 		Transaction tx = null;
 
 		Profesor profe = (Profesor) session.createQuery("SELECT p FROM Profesor p where p.id = :id")
 				.setParameter("id", profeId).uniqueResult();
 
-		Set<ContactInfo> info = profe.getContactInfos();
-		for (ContactInfo contactInfo : info) {
-			System.out.println("Profe: " + profe.getId() + " Contact info: " + contactInfo);
-		}
+		ContactInfo info = profe.getContactInfo();
+
+		System.out.println("Profe: " + profe.getId() + " Contact info: " + info);
 
 		ContactInfo cInfoNueva = new ContactInfo();
 		cInfoNueva.setEmail("algo@algo.com");
@@ -57,32 +64,41 @@ public class OneToOne {
 			}
 		}
 	}
+	/*
+	 * Lanza exception: OR: Infracción de la restricción UNIQUE KEY
+	 * 'UC_contactInfo_UNIQUE_profesorID'. No se puede insertar una clave duplicada
+	 * en el objeto 'dbo.contactInfo'. El valor de la clave duplicada es (1).
+	 * No se elimina el contactInfo inicialmente asociado al profesor y se intenta crear otro con el mismo profesorId
+	 */
+	private static void changeContactInfoFromContactInfo(Session session, int profeId) {
 
-	private static void addMoreThanOneContactInfoToProfesorFromContactInfo(Session session, int profeId) {
-		List<ContactInfo> infos =
-				// session.createQuery("SELECT p.contactInfos from Profesor p where p.id = :id")
-				session.createQuery("SELECT c from ContactInfo c where c.profesor.id = :id").setParameter("id", profeId)
-						.list();
+		ContactInfo info = (ContactInfo)
+		// session.createQuery("SELECT p.contactInfos from Profesor p where p.id = :id")
+		session.createQuery("SELECT c from ContactInfo c where c.profesor.id = :id").setParameter("id", profeId)
+				.uniqueResult();
 
 		ContactInfo cInfoNueva = new ContactInfo();
 		cInfoNueva.setEmail("algo2@algo.com");
 		cInfoNueva.setTlfMovil("666 123 123");
 		Transaction tx = null;
 		try {
-			
+
 			tx = session.beginTransaction();
-			for (ContactInfo contactInfo : infos) {
-				System.out.println("contact info: " + contactInfo + " profesor: " + contactInfo.getProfesor());
-				Profesor profe = contactInfo.getProfesor();
 
-				// Relación bidireccional
-				profe.addContactInfo(cInfoNueva);
+			System.out.println("contact info: " + info + " profesor: " + info.getProfesor());
+			Profesor profe = info.getProfesor();
 
-				
-				session.saveOrUpdate(cInfoNueva);
-				session.saveOrUpdate(profe);
+			// Relación bidireccional
+			profe.addContactInfo(cInfoNueva);
 
-			}
+			/*
+			 * ERROR: Infracción de la restricción UNIQUE KEY
+			 * 'UC_contactInfo_UNIQUE_profesorID'. No se puede insertar una clave duplicada
+			 * en el objeto 'dbo.contactInfo'. El valor de la clave duplicada es (1).
+			 */
+			session.saveOrUpdate(cInfoNueva);
+			session.saveOrUpdate(profe);
+
 			tx.commit();
 		} catch (Exception ex) {
 			System.out.println("Ha ocurrido una excepción: " + ex.getMessage());
@@ -92,5 +108,42 @@ public class OneToOne {
 		}
 
 	}
+	
+	private static void updateContactInfoToProfesor(Session session, int profeId) {
+		Transaction tx = null;
+
+		Profesor profe = (Profesor) session.createQuery("SELECT p FROM Profesor p where p.id = :id")
+				.setParameter("id", profeId).uniqueResult();
+
+		//info está asociado a la sesión con pk=1
+		ContactInfo info =  profe.getContactInfo();
+		if(info!=null) {
+			System.out.println("Profe: " + profe.getId() + " Contact info: " + info);
+		}
+		
+
+	
+		info.setEmail("algo@algo2.com");
+		info.setTlfMovil("666 123 123");
+
+		profe.addContactInfo(info);
+
+		try {
+			tx = session.beginTransaction();
+			session.saveOrUpdate(profe);
+			session.saveOrUpdate(info);
+
+			tx.commit();
+			System.out.println("Se ha actualizado correctamente");
+		} catch (Exception ex) {
+			System.out.println("Ha ocurrido una excepción: " + ex.getMessage());
+			ex.printStackTrace();
+			if (tx != null) {
+				tx.rollback();
+			}
+			throw ex;
+		}
+	}
+
 
 }
